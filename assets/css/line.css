@@ -1,0 +1,68 @@
+
+@font-face {
+  font-family: 'tm_sansregular';
+  src: url('../fonts/tmsans-regular-webfont.eot');
+  src: url('../fonts/tmsans-regular-webfont.eot?#iefix') format('embedded-opentype'),
+       url('../fonts/tmsans-regular-webfont.woff') format('woff'),                                                       
+       url('../fonts/tmsans-regular-webfont.ttf') format('truetype'),
+       url('../fonts/tmsans-regular-webfont.svg#tm_sansregular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+* {
+  font-family: 'tm_sansregular', arial, sans-serif;
+  line-height: 150%;
+  margin: 0px;
+}
+    body {
+        font: 10px sans-serif;
+        margin: 0;
+    }
+    path.line {
+        fill: none;
+        stroke: #666;
+        stroke-width: 1.5px;
+    }
+    path.area {
+        fill: #e7e7e7;
+    }
+    .axis {
+        shape-rendering: crispEdges;
+    }
+    .x.axis line {
+        stroke: #fff;
+    }
+    .x.axis .minor {
+        stroke-opacity: .5;
+    }
+    .x.axis path {
+        fill: none;
+        stroke: #000;
+    }
+    .y.axis line,
+    .y.axis path {
+        fill: none;
+        stroke: #000;
+    }
+    .guideline {
+        margin-right: 100px;
+        float: right;
+    }
+    .axis-label{
+      font-weight: bold;
+  font-variant: small-caps;
+  font-size: 12px;
+    }
+
+#line-chart
+{
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+
+}
+
+#line-chart svg {
+  border: 1px solid;
+}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+      <link href="assets/css/line.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+
+    <div id="line-chart"><svg></svg></div>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script>
+        var dataArray = [{
+            "name": "Foo Fighters",
+            "data": [{
+                "salesWindowPercentage": "0",
+                "value": "100"
+            }, {
+                "salesWindowPercentage": "20",
+                "value": "201"
+            }, {
+                "salesWindowPercentage": "70",
+                "value": "500"
+            }, {
+                "salesWindowPercentage": "90",
+                "value": "1024"
+            }]
+        }, {
+            "name": "Rob Zombie",
+            "data": [{
+                "salesWindowPercentage": "30",
+                "value": "10"
+            }, {
+                "salesWindowPercentage": "50",
+                "value": "203"
+            }, {
+                "salesWindowPercentage": "80",
+                "value": "300"
+            }, {
+                "salesWindowPercentage": "100",
+                "value": "501"
+            }]
+        }];
+
+        var margin = {
+                top: 80,
+                right: 80,
+                bottom: 80,
+                left: 80
+            },
+            width = 600 - margin.left - margin.right,
+            height = 350 - margin.top - margin.bottom;
+
+        // Scales and axes. Note the inverted domain for the y-scale: bigger is up!
+        var xScale = d3.scale.linear().range([0, width]),
+            yScale = d3.scale.linear().range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+            .scale(xScale)
+            .ticks(11);
+
+        var yAxis = d3.svg.axis()
+            .scale(yScale)
+            .ticks(5)
+            .orient("left");
+
+        // A line generator, for the dark stroke.
+        var line = d3.svg.line()
+            .interpolate("monotone")
+            .x(function(d) {
+                return xScale(d[0]);
+            })
+            .y(function(d) {
+                return yScale(d[1]);
+            });
+
+
+        var seriesArray = [];
+
+        dataArray.forEach(function(dataSeries) {
+
+            var currentSeriesName = dataSeries.name;
+            var currentSeriesData = dataSeries.data;
+            var standardSeriesData = [];
+
+            for (var i = 0; i < currentSeriesData.length; i++) {
+                var currentDataItem = currentSeriesData[i];
+
+                // scale it here too.
+                var currentDataCoord = [currentDataItem.salesWindowPercentage, currentDataItem.value];
+                standardSeriesData.push(currentDataCoord);
+            }
+
+            var rangeXCoords = d3.extent(standardSeriesData, function(d) {
+                return d[0];
+            });
+            var rangeYCoords = d3.extent(standardSeriesData, function(d) {
+                return d[1];
+            });
+
+            var series = {
+                "name": currentSeriesName,
+                "range": {
+                    "x": rangeXCoords,
+                    "y": rangeYCoords
+                },
+                "data": standardSeriesData
+            };
+            seriesArray.push(series);
+        });
+
+        //set the scale values now we know what to use. Or X scale is a percentage, so the domain is easy.
+        xScale.domain([0, 100]);
+        yScale.domain([d3.min(seriesArray, function(series) {
+            return series.range.y[0]
+        }), d3.max(seriesArray, function(series) {
+            return series.range.y[1]
+        })]);
+
+        //Draw stuff
+        var svg = d3.select("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+        // Add the clip path.
+        svg.append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+            .attr("width", width)
+            .attr("height", height);
+
+        // Add the x-axis.
+        svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis);
+
+        // Add x-axis label
+        svg.append("text")
+            .attr("class", "axis-label")
+            .attr("text-anchor", "middle")
+            .attr("x", width / 2)
+            .attr("y", height + (margin.bottom/2) +10) //why +10
+            .text("Percentage through sales window");
+
+        // Add the y-axis.
+        svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+        svg.append("text")
+            .attr("class", "axis-label")
+            .attr("text-anchor", "middle")
+            .attr("x", -(width / 4))
+            .attr("y", -(margin.left/2)-10)
+            .attr("transform", "rotate(-90)")
+            .text("Sales volume");
+
+        var colors = d3.scale.ordinal().range(["#0299A3", "#EA0087", "#FFD119", "#213975", "#EA8522"]);
+        svg.selectAll('.line')
+            .data(seriesArray) //?
+            .enter()
+            .append('path')
+            .attr('class', 'line')
+            .style('stroke', function(d) {
+                return colors(Math.random() * 50);
+            })
+            .attr('clip-path', 'url(#clip)')
+            .attr('d', function(d) {
+                return line(d.data);
+            })
+
+        /* Add 'curtain' rectangle to hide entire graph */
+        var curtain = svg.append('rect')
+            .attr('x', -1 * (width + 1))
+            .attr('y', -1 * (height - 1))
+            .attr('height', height)
+            .attr('width', width)
+            .attr('class', 'curtain')
+            .attr('transform', 'rotate(180)')
+            .style('fill', '#ffffff')
+
+        /* Optionally add a guideline */
+        var guideline = svg.append('line')
+            .attr('stroke', '#333')
+            .attr('stroke-width', 0)
+            .attr('class', 'guide')
+            .attr('x1', 1)
+            .attr('y1', 1)
+            .attr('x2', 1)
+            .attr('y2', height)
+
+        /* Create a shared transition for anything we're animating */
+        var t = svg.transition()
+            .delay(500)
+            .duration(5000)
+            .ease('linear')
+            .each('end', function() {
+                d3.select('line.guide')
+                    .transition()
+                    .style('opacity', 0)
+                    .remove()
+            });
+
+        t.select('rect.curtain')
+            .attr('width', 0);
+        t.select('line.guide')
+            .attr('transform', 'translate(' + width + ', 0)')
+    </script>
