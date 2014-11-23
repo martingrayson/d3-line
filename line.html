@@ -22,16 +22,16 @@
             "class": "artist",
             "data": [{
                 "salesWindowPercentage": "0",
-                "value": "100"
+                "value": "5"
             }, {
                 "salesWindowPercentage": "20",
-                "value": "201"
+                "value": "55"
             }, {
                 "salesWindowPercentage": "70",
-                "value": "500"
+                "value": "30"
             }, {
                 "salesWindowPercentage": "90",
-                "value": "1024"
+                "value": "10"
             }]
         }, {
             "name": "Rob Zombie",
@@ -41,29 +41,29 @@
                 "value": "10"
             }, {
                 "salesWindowPercentage": "50",
-                "value": "203"
+                "value": "20"
             }, {
                 "salesWindowPercentage": "80",
-                "value": "300"
+                "value": "30"
             }, {
                 "salesWindowPercentage": "100",
-                "value": "501"
+                "value": "40"
             }]
         }, {
             "name": "Rock",
             "class": "genre",
             "data": [{
                 "salesWindowPercentage": "20",
-                "value": "10"
+                "value": "5"
             }, {
                 "salesWindowPercentage": "55",
-                "value": "203"
+                "value": "10"
             }, {
                 "salesWindowPercentage": "82",
-                "value": "300"
+                "value": "40"
             }, {
                 "salesWindowPercentage": "90",
-                "value": "501"
+                "value": "45"
             }]
         }];
 
@@ -114,13 +114,18 @@
                 return yScale(d[1]);
             });
 
-        // Set the scale values now we know what to use. Or X scale is a percentage, so the domain is easy.
+        // Set the scale values.
         xScale.domain([0, 100]);
-        yScale.domain([d3.min(seriesArray, function(series) {
-            return series.range.y[0]
-        }), d3.max(seriesArray, function(series) {
-            return series.range.y[1]
-        })]);
+        yScale.domain(
+            [
+                d3.min(seriesArray, function(series) {
+                    return 0; //return series.range.y[0]
+                }),
+                d3.max(seriesArray, function(series) {
+                    return (
+                        Math.round(d3.max(seriesArray, function(series) { return series.range.y[1];})/10))*10;
+                })
+            ]);
 
         //Draw stuff
         var svg = d3.select("svg")
@@ -162,7 +167,7 @@
             .attr("x", -(width / 4))
             .attr("y", -(margin.left / 2) - 10)
             .attr("transform", "rotate(-90)")
-            .text("Sales volume");
+            .text("Percentage of total tickets sold");
 
         // Draw our lines
         svg.selectAll('.line')
