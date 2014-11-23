@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+
 <head>
-      <link href="assets/css/line.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/line.css" rel="stylesheet" type="text/css">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
 </head>
+
 <body>
 
-    <div id="line-chart"><svg></svg></div>
-    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <div id="line-chart">
+        <svg>
+        </svg>
+    </div>
+
     <script>
+        /*
+         * Our standard data array object.
+         */
         var dataArray = [{
             "name": "Foo Fighters",
             "class": "artist",
@@ -39,7 +48,8 @@
             }, {
                 "salesWindowPercentage": "100",
                 "value": "501"
-            }]}, {
+            }]
+        }, {
             "name": "Rock",
             "class": "genre",
             "data": [{
@@ -57,6 +67,11 @@
             }]
         }];
 
+        /*
+         * ***************
+         * Config values
+         * ***************
+         */
         var margin = {
                 top: 80,
                 right: 150,
@@ -66,7 +81,17 @@
             width = 600 - margin.left - margin.right,
             height = 350 - margin.top - margin.bottom;
 
-        // Scales and axes. Note the inverted domain for the y-scale: bigger is up!
+        // Set our colour scale.
+        var colors = d3.scale.ordinal().range(["#0299A3", "#EA0087", "#FFD119", "#213975", "#EA8522"]);
+
+        // Setup our data
+        var seriesArray = processSeriesData(dataArray);
+
+        /*
+         * ***************
+         * Draw each component
+         * ***************
+         */
         var xScale = d3.scale.linear().range([0, width]),
             yScale = d3.scale.linear().range([height, 0]);
 
@@ -89,44 +114,7 @@
                 return yScale(d[1]);
             });
 
-
-        var seriesArray = [];
-
-        dataArray.forEach(function(dataSeries) {
-
-            var currentSeriesName = dataSeries.name;
-            var currentSeriesData = dataSeries.data;
-            var currentSeriesClass = dataSeries.class;
-            var standardSeriesData = [];
-
-            for (var i = 0; i < currentSeriesData.length; i++) {
-                var currentDataItem = currentSeriesData[i];
-
-                // scale it here too.
-                var currentDataCoord = [currentDataItem.salesWindowPercentage, currentDataItem.value];
-                standardSeriesData.push(currentDataCoord);
-            }
-
-            var rangeXCoords = d3.extent(standardSeriesData, function(d) {
-                return d[0];
-            });
-            var rangeYCoords = d3.extent(standardSeriesData, function(d) {
-                return d[1];
-            });
-
-            var series = {
-                "name": currentSeriesName,
-                "class": currentSeriesClass,
-                "range": {
-                    "x": rangeXCoords,
-                    "y": rangeYCoords
-                },
-                "data": standardSeriesData
-            };
-            seriesArray.push(series);
-        });
-
-        //set the scale values now we know what to use. Or X scale is a percentage, so the domain is easy.
+        // Set the scale values now we know what to use. Or X scale is a percentage, so the domain is easy.
         xScale.domain([0, 100]);
         yScale.domain([d3.min(seriesArray, function(series) {
             return series.range.y[0]
@@ -140,7 +128,6 @@
             .attr("height", height + margin.top + margin.bottom)
             .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 
         // Add the clip path.
         svg.append("clipPath")
@@ -160,7 +147,7 @@
             .attr("class", "axis-label")
             .attr("text-anchor", "middle")
             .attr("x", width / 2)
-            .attr("y", height + (margin.bottom/2) +10) //why +10
+            .attr("y", height + (margin.bottom / 2) + 10) //why +10
             .text("Percentage through sales window");
 
         // Add the y-axis.
@@ -168,20 +155,23 @@
             .attr("class", "y axis")
             .call(yAxis);
 
+        // Y-axis label
         svg.append("text")
             .attr("class", "axis-label")
             .attr("text-anchor", "middle")
             .attr("x", -(width / 4))
-            .attr("y", -(margin.left/2)-10)
+            .attr("y", -(margin.left / 2) - 10)
             .attr("transform", "rotate(-90)")
             .text("Sales volume");
 
-        var colors = d3.scale.ordinal().range(["#0299A3", "#EA0087", "#FFD119", "#213975", "#EA8522"]);
+        // Draw our lines
         svg.selectAll('.line')
-            .data(seriesArray) //?
+            .data(seriesArray)
             .enter()
             .append('path')
-            .attr('class', function(d){return d.class+ ' line'})
+            .attr('class', function(d) {
+                return d.class + ' line'
+            })
             .style('stroke', function(d) {
                 return colors(Math.random() * 50);
             })
@@ -190,33 +180,36 @@
                 return line(d.data);
             })
 
-         // draw legend
-  var legend = svg.selectAll(".legend")
-      .data(colors.domain())
-    .enter().append("g")
-      .attr("class", "legend")
-      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+        // Draw legend
+        var legend = svg.selectAll(".legend")
+            .data(colors.domain())
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function(d, i) {
+                return "translate(0," + i * 20 + ")";
+            });
 
-  // draw legend colored rectangles
-  legend.append("rect")
-      .attr("x", width + (margin.right-18-10))
-      .attr("width", 18)
-      .attr("height", 18)
-      .style("fill", colors);
+        // Draw legend colored rectangles
+        legend.append("rect")
+            .attr("x", width + (margin.right - 18 - 10))
+            .attr("width", 18)
+            .attr("height", 18)
+            .style("fill", colors);
 
-  // draw legend text
-  legend.append("text")
-      .attr("x", width + (margin.right)-18-10-10)
-      .attr("y", 8)
-      .attr("dy", ".55em")
-      .style("text-anchor", "end")
-      .attr("class", function(d,i){return 'legend-label '+seriesArray[i].class;})
-      .text(function(d,i) { 
-        return (seriesArray[i].class=='genre'?seriesArray[i].name+' (avg)':seriesArray[i].name);
-    })
+        // Draw legend text
+        legend.append("text")
+            .attr("x", width + (margin.right) - 18 - 10 - 10)
+            .attr("y", 8)
+            .attr("dy", ".55em")
+            .style("text-anchor", "end")
+            .attr("class", function(d, i) {
+                return 'legend-label ' + seriesArray[i].class;
+            })
+            .text(function(d, i) {
+                return (seriesArray[i].class == 'genre' ? seriesArray[i].name + ' (avg)' : seriesArray[i].name);
+            })
 
-
-        /* Add 'curtain' rectangle to hide entire graph */
+        // Add rectangle to hide entire graph
         var curtain = svg.append('rect')
             .attr('x', -1 * (width + 1))
             .attr('y', -1 * (height - 1))
@@ -226,17 +219,6 @@
             .attr('transform', 'rotate(180)')
             .style('fill', '#ffffff')
 
-        /* Optionally add a guideline */
-        var guideline = svg.append('line')
-            .attr('stroke', '#333')
-            .attr('stroke-width', 0)
-            .attr('class', 'guide')
-            .attr('x1', 1)
-            .attr('y1', 1)
-            .attr('x2', 1)
-            .attr('y2', height)
-
-        /* Create a shared transition for anything we're animating */
         var t = svg.transition()
             .delay(500)
             .duration(5000)
@@ -250,6 +232,49 @@
 
         t.select('rect.curtain')
             .attr('width', 0);
-        t.select('line.guide')
-            .attr('transform', 'translate(' + width + ', 0)')
+
+        /*
+         * ***************
+         * Helper functions
+         * ***************
+         */
+        function processSeriesData(inputDataArray) {
+            // Read our data
+            var seriesArray = [];
+            inputDataArray.forEach(function(dataSeries) {
+
+                var currentSeriesName = dataSeries.name;
+                var currentSeriesData = dataSeries.data;
+                var currentSeriesClass = dataSeries.class;
+                var standardSeriesData = [];
+
+                for (var i = 0; i < currentSeriesData.length; i++) {
+                    var currentDataItem = currentSeriesData[i];
+
+                    // scale it here too.
+                    var currentDataCoord = [currentDataItem.salesWindowPercentage, currentDataItem.value];
+                    standardSeriesData.push(currentDataCoord);
+                }
+
+                var rangeXCoords = d3.extent(standardSeriesData, function(d) {
+                    return d[0];
+                });
+                var rangeYCoords = d3.extent(standardSeriesData, function(d) {
+                    return d[1];
+                });
+
+                var series = {
+                    "name": currentSeriesName,
+                    "class": currentSeriesClass,
+                    "range": {
+                        "x": rangeXCoords,
+                        "y": rangeYCoords
+                    },
+                    "data": standardSeriesData
+                };
+                seriesArray.push(series);
+            });
+
+            return seriesArray;
+        }
     </script>
