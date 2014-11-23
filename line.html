@@ -10,6 +10,7 @@
     <script>
         var dataArray = [{
             "name": "Foo Fighters",
+            "class": "artist",
             "data": [{
                 "salesWindowPercentage": "0",
                 "value": "100"
@@ -25,6 +26,7 @@
             }]
         }, {
             "name": "Rob Zombie",
+            "class": "artist",
             "data": [{
                 "salesWindowPercentage": "30",
                 "value": "10"
@@ -37,12 +39,27 @@
             }, {
                 "salesWindowPercentage": "100",
                 "value": "501"
+            }]}, {
+            "name": "Rock",
+            "class": "genre",
+            "data": [{
+                "salesWindowPercentage": "20",
+                "value": "10"
+            }, {
+                "salesWindowPercentage": "55",
+                "value": "203"
+            }, {
+                "salesWindowPercentage": "82",
+                "value": "300"
+            }, {
+                "salesWindowPercentage": "90",
+                "value": "501"
             }]
         }];
 
         var margin = {
                 top: 80,
-                right: 80,
+                right: 150,
                 bottom: 80,
                 left: 80
             },
@@ -79,6 +96,7 @@
 
             var currentSeriesName = dataSeries.name;
             var currentSeriesData = dataSeries.data;
+            var currentSeriesClass = dataSeries.class;
             var standardSeriesData = [];
 
             for (var i = 0; i < currentSeriesData.length; i++) {
@@ -98,6 +116,7 @@
 
             var series = {
                 "name": currentSeriesName,
+                "class": currentSeriesClass,
                 "range": {
                     "x": rangeXCoords,
                     "y": rangeYCoords
@@ -162,7 +181,7 @@
             .data(seriesArray) //?
             .enter()
             .append('path')
-            .attr('class', 'line')
+            .attr('class', function(d){return d.class+ ' line'})
             .style('stroke', function(d) {
                 return colors(Math.random() * 50);
             })
@@ -170,6 +189,32 @@
             .attr('d', function(d) {
                 return line(d.data);
             })
+
+         // draw legend
+  var legend = svg.selectAll(".legend")
+      .data(colors.domain())
+    .enter().append("g")
+      .attr("class", "legend")
+      .attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
+
+  // draw legend colored rectangles
+  legend.append("rect")
+      .attr("x", width + (margin.right-18-10))
+      .attr("width", 18)
+      .attr("height", 18)
+      .style("fill", colors);
+
+  // draw legend text
+  legend.append("text")
+      .attr("x", width + (margin.right)-18-10-10)
+      .attr("y", 8)
+      .attr("dy", ".55em")
+      .style("text-anchor", "end")
+      .attr("class", function(d,i){return 'legend-label '+seriesArray[i].class;})
+      .text(function(d,i) { 
+        return (seriesArray[i].class=='genre'?seriesArray[i].name+' (avg)':seriesArray[i].name);
+    })
+
 
         /* Add 'curtain' rectangle to hide entire graph */
         var curtain = svg.append('rect')

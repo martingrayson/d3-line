@@ -19,6 +19,14 @@
         font: 10px sans-serif;
         margin: 0;
     }
+
+     path.genre {
+        fill: none;
+        stroke: #666;
+        stroke-width: 1.5px;
+        stroke-dasharray:10,10;
+    }
+
     path.line {
         fill: none;
         stroke: #666;
@@ -53,6 +61,10 @@
       font-weight: bold;
   font-variant: small-caps;
   font-size: 12px;
+    }
+
+    text.legend-label.genre {
+      fill: #4C4C4C;
     }
 
 #line-chart
