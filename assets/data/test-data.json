@@ -1,0 +1,49 @@
+[{
+            "name": "Foo Fighters",
+            "class": "artist",
+            "data": [{
+                "salesWindowPercentage": "0",
+                "value": "5"
+            }, {
+                "salesWindowPercentage": "20",
+                "value": "55"
+            }, {
+                "salesWindowPercentage": "70",
+                "value": "30"
+            }, {
+                "salesWindowPercentage": "90",
+                "value": "10"
+            }]
+        }, {
+            "name": "Rob Zombie",
+            "class": "artist",
+            "data": [{
+                "salesWindowPercentage": "30",
+                "value": "10"
+            }, {
+                "salesWindowPercentage": "50",
+                "value": "20"
+            }, {
+                "salesWindowPercentage": "80",
+                "value": "30"
+            }, {
+                "salesWindowPercentage": "100",
+                "value": "40"
+            }]
+        }, {
+            "name": "Rock",
+            "class": "genre",
+            "data": [{
+                "salesWindowPercentage": "20",
+                "value": "5"
+            }, {
+                "salesWindowPercentage": "55",
+                "value": "10"
+            }, {
+                "salesWindowPercentage": "82",
+                "value": "40"
+            }, {
+                "salesWindowPercentage": "90",
+                "value": "45"
+            }]
+        }];

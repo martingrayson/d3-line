@@ -1,0 +1,31 @@
+{
+  "name": "d3-line",
+  "version": "1.0.0",
+  "description": "d3 line graph generator",
+  "main": "bundle.js",
+  "scripts": {
+    "build": "browserify app/sales.js -o app/dist/bundle.js",
+    "build-min": "browserify app/sales.js --s bundle | uglifyjs -c > app/dist/bundle.min.js",
+    "watch": "watchify app/sales.js -o app/dist/bundle.js"
+  },
+  "devDependencies": {
+    "watchify": "^2.1.1",
+    "uglify-js": "^1.2.5"
+  },
+  "dependencies": {
+    "jquery": ">= 1.0",
+     "d3": ">=2.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/martingrayson/d3-line.git"
+  },
+  "author": {
+    "name": "Martin Grayson",
+    "email": "martin@mgrayson.co.uk"
+  },
+  "bugs": {
+    "url": "https://github.com/martingrayson/d3-line/issues"
+  },
+  "homepage": "https://github.com/martingrayson/d3-line"
+}
